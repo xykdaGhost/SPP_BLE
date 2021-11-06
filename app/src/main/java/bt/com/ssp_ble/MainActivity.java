@@ -8,6 +8,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -19,6 +23,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -52,6 +57,10 @@ public class MainActivity extends Activity {
     private String dataBuffer1 = null;
     private String dataBuffer2 = null;
     private String data = null;
+    private int[] wave = new int[150];
+
+    private ImageView imageView;
+
 
     String TAG = "CarControl";
     // Intent request codes
@@ -520,8 +529,38 @@ public class MainActivity extends Activity {
             tempData = data.substring(53, 59);
             dataText.setText(String.valueOf(tempData));
 
+            int firstchar = 66;
+            int lastchar = 66;
+            for (int i = 0; data.charAt(firstchar) != 'E'; firstchar++) {
+                while (data.charAt(lastchar) != ',') {
+                    lastchar++;
+                }
+                String temp1 = data.substring(firstchar, lastchar);
+                wave[i] = Integer.parseInt(String.valueOf(data.substring(firstchar, lastchar)));
+                i++;
+                firstchar = lastchar;
+                lastchar++;
+            }
 
             flashflag++;
+
+            imageView = (ImageView) findViewById(R.id.axis);
+            Bitmap bitmap = Bitmap.createBitmap(imageView.getWidth(), imageView.getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            Paint paint = new Paint();
+            paint.setColor(Color.RED);
+            paint.setStrokeWidth(8);
+
+            for (int i = 0; i < 127; i++) {
+
+                canvas.drawLine(((float) imageView.getWidth())/140*(i+6), imageView.getHeight()-(((float) imageView.getHeight())/106*(wave[i]+3)), ((float) imageView.getWidth())/140*(i+7), imageView.getHeight()-(((float) imageView.getHeight())/106*(wave[i+1]+3)), paint);
+//                canvas.drawLine(0,0, 0, imageView.getHeight(), paint);
+//                canvas.drawLine(10,0, 10, imageView.getHeight(), paint);
+//                canvas.drawLine(imageView.getWidth(),0, imageView.getWidth(), imageView.getHeight(), paint);
+//                canvas.drawLine(50,0, 50, imageView.getHeight()-20, paint);
+
+            }
+           imageView.setImageBitmap(bitmap);
         }
 
     }
