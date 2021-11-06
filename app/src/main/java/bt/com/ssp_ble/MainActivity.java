@@ -211,6 +211,7 @@ public class MainActivity extends Activity {
                 txcount = 0;rxcount=0;
                 ttx.setText("TX: "+txcount);
                 trx.setText("RX: "+rxcount);
+                flashflag = 0;
                 msg_Text.setText("");break;
             case R.id.mback:
                 act_end();break;
