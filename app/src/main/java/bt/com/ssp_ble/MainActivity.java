@@ -37,6 +37,7 @@ public class MainActivity extends Activity {
     public static final int MESSAGE_WRITE = 3;
     public static final int MESSAGE_DEVICE_NAME = 4;
     public static final int MESSAGE_TOAST = 5;
+    private static int flashflag = 0;
     private String mConnectedDeviceName = null;
     // Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;
@@ -44,6 +45,13 @@ public class MainActivity extends Activity {
     private BluetoothChatService mChatService = null;
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
+
+    private TextView thdText;
+    private  TextView dataText;
+
+    private String dataBuffer1 = null;
+    private String dataBuffer2 = null;
+    private String data = null;
 
     String TAG = "CarControl";
     // Intent request codes
@@ -420,7 +428,9 @@ public class MainActivity extends Activity {
         }
     };
 
-    LinearLayout mLayout;TextView msg_Text;ScrollView mScrollView;
+    LinearLayout mLayout;
+    TextView msg_Text;
+    ScrollView mScrollView;
 
     private final Handler tHandler = new Handler();
     private Runnable mScrollToBottom = new Runnable() {
@@ -439,6 +449,7 @@ public class MainActivity extends Activity {
             nstr = nstr.substring(t.length(),nstr.length());
             msg_Text.setText(nstr);
         }
+
         //msg_Text.append(Html.fromHtml(t));
         msg_Text.append(t);
         tHandler.post(mScrollToBottom);//更新Scroll
@@ -474,9 +485,45 @@ public class MainActivity extends Activity {
                 throw   new   RuntimeException("Unsupported   encoding   type.");
             }
         }
+
+        if (flashflag < 10) {
+            data += msg;
+            flashflag++;
+        }
+
         show_data(msg);
         //if(isSend)Add_Sended(msg);
         //else Add_Readed(msg);
+
+        if (flashflag == 10) {
+            data = data.substring(data.indexOf('T'));
+            while (data.charAt(1) != 'H') {
+                data = data.substring(data.indexOf('T'));
+            }
+            String tempData = data.substring(4, 11);
+            thdText = (TextView) findViewById(R.id.thd);
+            thdText.setText(String.valueOf(tempData));
+
+            dataText = (TextView) findViewById(R.id.mag_1);
+            tempData = data.substring(17, 23);
+            dataText.setText(String.valueOf(tempData));
+
+            dataText = (TextView) findViewById(R.id.mag_2);
+            tempData = data.substring(29, 35);
+            dataText.setText(String.valueOf(tempData));
+
+            dataText = (TextView) findViewById(R.id.mag_3);
+            tempData = data.substring(41, 47);
+            dataText.setText(String.valueOf(tempData));
+
+            dataText = (TextView) findViewById(R.id.mag_4);
+            tempData = data.substring(53, 59);
+            dataText.setText(String.valueOf(tempData));
+
+
+            flashflag++;
+        }
+
     }
 
     public void sendMessage(View v) {
